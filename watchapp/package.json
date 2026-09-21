@@ -1,0 +1,32 @@
+{
+  "name": "yanavipeb-watchapp",
+  "author": "kryu",
+  "version": "0.1.0",
+  "keywords": ["pebble-app"],
+  "private": true,
+  "dependencies": {},
+  "pebble": {
+    "displayName": "YaNaviPeb",
+    "uuid": "2fa3743c-bafc-4d0c-b784-188e1bee90b8",
+    "sdkVersion": "3",
+    "enableMultiJS": true,
+    "targetPlatforms": [
+      "emery"
+    ],
+    "watchapp": {
+      "watchface": false
+    },
+    "messageKeys": [
+      "STATE",
+      "DISTANCE",
+      "MANEUVER",
+      "REMAINING",
+      "ETA",
+      "DURATION",
+      "ICON"
+    ],
+    "resources": {
+      "media": []
+    }
+  }
+}
