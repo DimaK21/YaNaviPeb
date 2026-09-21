@@ -1,0 +1,20 @@
+.DS_Store
+
+# Android / Gradle
+.gradle/
+.idea/
+*.iml
+local.properties
+build/
+*.apk
+*.aab
+*.keystore
+*.jks
+
+# Pebble SDK
+.lock-waf*
+.waf*
+node_modules/
+
+# Captured notification dumps
+dump/
