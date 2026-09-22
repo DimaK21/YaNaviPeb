@@ -16,6 +16,14 @@
     "watchapp": {
       "watchface": false
     },
+    "companionApp": {
+      "android": {
+        "required": true,
+        "apps": [
+          { "package": "ru.kryu.yanavipeb" }
+        ]
+      }
+    },
     "messageKeys": [
       "STATE",
       "DISTANCE",
