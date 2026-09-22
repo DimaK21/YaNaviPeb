@@ -105,7 +105,6 @@ android/                  Android-приложение (Kotlin, View Binding)
   app/src/main/.../demo/    записанный маршрут для демо-режима
 watchapp/                 приложение для часов (C, Pebble SDK)
   tools/                    патч appinfo, тестовые сообщения для эмулятора
-spike-notification-dump/  утилита для изучения формата уведомлений (сборка без Gradle)
 ```
 
 Тесты Android-приложения:

@@ -106,7 +106,6 @@ android/                  Android app (Kotlin, View Binding)
   app/src/main/.../demo/    recorded route for the demo mode
 watchapp/                 watchapp (C, Pebble SDK)
   tools/                    appinfo patch, sample messages for the emulator
-spike-notification-dump/  tool for inspecting notification formats (built without Gradle)
 ```
 
 Android unit tests:
