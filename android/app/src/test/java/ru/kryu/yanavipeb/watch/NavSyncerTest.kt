@@ -213,4 +213,22 @@ class NavSyncerTest {
         runCurrent()
         assertEquals(0, f.transport.stops)
     }
+
+    @Test
+    fun watchNeverSeesFinishedWhenNavigationResumesWithinGracePeriod() = runTest {
+        val f = fixture()
+        f.transport.watchOpenFlow.value = true
+        f.syncer.onNavState(nav())
+        runCurrent()
+        f.syncer.onNavState(NavState.IDLE)
+        runCurrent()
+        advanceTimeBy(4_000)
+        f.syncer.onNavState(nav())
+        runCurrent()
+        advanceTimeBy(10_000)
+        runCurrent()
+
+        assertEquals(1, f.transport.sends.size)
+        assertEquals(0, f.transport.stops)
+    }
 }

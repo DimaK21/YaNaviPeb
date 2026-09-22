@@ -18,6 +18,13 @@ static bool icon_bit(int x, int y) {
   return s_state->icon[y * (ICON_SIZE / 8) + x / 8] & (0x80 >> (x % 8));
 }
 
+// The watch's own locale, not the phone's: distance/maneuver/eta/duration come from Yandex Maps
+// as-is and are not translated here.
+static bool is_russian_locale(void) {
+  const char *locale = i18n_get_system_locale();
+  return locale && strncmp(locale, "ru", 2) == 0;
+}
+
 static void icon_update_proc(Layer *layer, GContext *ctx) {
   if (!s_state->has_icon) return;
   graphics_context_set_fill_color(ctx, GColorWhite);
@@ -105,7 +112,10 @@ void nav_window_refresh(void) {
   layer_set_hidden(text_layer_get_layer(s_summary_layer), !navigating);
 
   if (!navigating) {
-    text_layer_set_text(s_message_layer, s_state->finished ? "Навигация завершена" : "Запустите навигацию в Картах");
+    bool ru = is_russian_locale();
+    text_layer_set_text(s_message_layer, s_state->finished
+        ? (ru ? "Навигация завершена" : "Navigation finished")
+        : (ru ? "Ожидание навигации" : "Waiting for navigation"));
     return;
   }
 
