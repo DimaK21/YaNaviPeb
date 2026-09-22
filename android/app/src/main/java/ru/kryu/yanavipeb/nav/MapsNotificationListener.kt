@@ -5,6 +5,7 @@ import android.content.ComponentName
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import android.util.Log
+import ru.kryu.yanavipeb.BuildConfig
 import ru.kryu.yanavipeb.NavRuntime
 
 /** Feeds every Yandex Maps navigation notification into [NavRuntime]'s syncer. */
@@ -31,7 +32,8 @@ class MapsNotificationListener : NotificationListenerService() {
     private fun handle(sbn: StatusBarNotification) {
         if (!isNavigation(sbn)) return
         val state = NavStateParser.parse(reader.read(sbn))
-        if (state != lastLogged) {
+        // state.toString() includes the route (maneuver text, ETA); keep it out of release logs.
+        if (BuildConfig.DEBUG && state != lastLogged) {
             Log.i(TAG, state.toString())
             lastLogged = state
         }
