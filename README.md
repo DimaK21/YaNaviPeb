@@ -26,7 +26,11 @@ The project has two parts:
 
 - **Android app** (`android/`) reads the Yandex Maps notification with a `NotificationListenerService`,
   extracts the distance, maneuver, arrival time, remaining distance and time, and the maneuver icon,
-  and sends only the changed fields to the watch, at most once per second.
+  and sends only the changed fields to the watch, at most once per second. The fields are read
+  from the notification's custom layout: the app inflates its `RemoteViews` and finds the fields by
+  their view resource names (`titleView`, `remainingDistanceView`, `timeOfArrivalView`,
+  `primaryIconTinted` and so on). If the distance or the maneuver view is missing, the notification's
+  standard title and text are used instead.
 - **Watchapp** (`watchapp/`, C, Pebble SDK) receives the data over AppMessage and draws the screen.
 
 Communication goes through the official Pebble phone app (`coredevices.coreapp`) and the
