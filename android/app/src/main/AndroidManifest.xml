@@ -36,14 +36,6 @@
                 <action android:name="android.service.notification.NotificationListenerService" />
             </intent-filter>
         </service>
-
-        <service
-            android:name=".watch.PebbleListenerService"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="io.rebble.pebblekit2.RECEIVE_DATA_FROM_WATCH" />
-            </intent-filter>
-        </service>
     </application>
 
 </manifest>

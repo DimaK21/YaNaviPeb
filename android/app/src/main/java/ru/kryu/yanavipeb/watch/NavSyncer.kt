@@ -11,7 +11,8 @@ import ru.kryu.yanavipeb.nav.NavState
 /**
  * Keeps the watch in step with the latest [NavState]: starts and stops the watchapp, sends only
  * what changed, at most once per [minIntervalMs], and resends everything when the watchapp reopens.
- * [now] is a monotonic clock in milliseconds.
+ * [now] is a monotonic clock in milliseconds. Whether the watchapp is open comes from
+ * [WatchTransport.watchappOpen], collected for the lifetime of this instance.
  */
 class NavSyncer(
     private val transport: WatchTransport,
@@ -28,28 +29,27 @@ class NavSyncer(
     private var flushJob: Job? = null
     private var stopJob: Job? = null
 
-    fun onNavState(state: NavState) {
-        scope.launch { lock.withLock { handleState(state) } }
-    }
-
-    fun onWatchOpened() {
+    init {
         scope.launch {
-            lock.withLock {
-                watchOpen = true
-                sent = NavState.IDLE // a freshly opened watchapp starts with an empty state
-                flush()
+            transport.watchappOpen().collect { open ->
+                lock.withLock { applyWatchOpen(open) }
             }
         }
     }
 
-    fun onWatchClosed() {
-        scope.launch {
-            lock.withLock {
-                watchOpen = false
-                sent = null
-                flushJob?.cancel()
-                flushJob = null
-            }
+    fun onNavState(state: NavState) {
+        scope.launch { lock.withLock { handleState(state) } }
+    }
+
+    private suspend fun applyWatchOpen(open: Boolean) {
+        watchOpen = open
+        if (open) {
+            sent = NavState.IDLE // a freshly opened watchapp starts with an empty state
+            flush()
+        } else {
+            sent = null
+            flushJob?.cancel()
+            flushJob = null
         }
     }
 

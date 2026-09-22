@@ -15,6 +15,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import ru.kryu.yanavipeb.databinding.ActivityMainBinding
 import ru.kryu.yanavipeb.demo.DemoPlayer
+import ru.kryu.yanavipeb.watch.Protocol
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -59,7 +60,7 @@ class MainActivity : AppCompatActivity() {
 
     @Suppress("DEPRECATION")
     private fun isPebbleInstalled(): Boolean = try {
-        packageManager.getPackageInfo(PEBBLE_PACKAGE, 0)
+        packageManager.getPackageInfo(Protocol.PEBBLE_APP_PACKAGE, 0)
         true
     } catch (e: PackageManager.NameNotFoundException) {
         false
@@ -80,7 +81,4 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private companion object {
-        const val PEBBLE_PACKAGE = "coredevices.coreapp"
-    }
 }

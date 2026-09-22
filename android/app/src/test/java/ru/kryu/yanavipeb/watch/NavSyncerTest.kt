@@ -3,6 +3,8 @@ package ru.kryu.yanavipeb.watch
 import io.rebble.pebblekit2.common.model.PebbleDictionary
 import io.rebble.pebblekit2.common.model.PebbleDictionaryItem
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runCurrent
@@ -19,6 +21,9 @@ class NavSyncerTest {
         var stops = 0
         var sendResult = true
 
+        /** Stands in for PebbleActiveAppObserver: tests flip this instead of pushing open/close events. */
+        val watchOpenFlow = MutableStateFlow(false)
+
         override suspend fun send(data: PebbleDictionary): Boolean {
             sends += clock() to data
             return sendResult
@@ -33,11 +38,17 @@ class NavSyncerTest {
             stops++
             return true
         }
+
+        override fun watchappOpen(): Flow<Boolean> = watchOpenFlow
     }
 
     private class Fixture(scope: TestScope) {
         val transport = FakeTransport { scope.testScheduler.currentTime }
-        val syncer = NavSyncer(transport, scope, { scope.testScheduler.currentTime })
+
+        // NavSyncer's init block collects transport.watchappOpen() for its whole lifetime, so it
+        // must run on backgroundScope: runTest fails if a coroutine on the test's own scope is
+        // still active when the test body returns (kotlinx.coroutines.test.UncompletedCoroutinesError).
+        val syncer = NavSyncer(transport, scope.backgroundScope, { scope.testScheduler.currentTime })
     }
 
     private fun nav(distance: String = "150 м") =
@@ -73,7 +84,7 @@ class NavSyncerTest {
     @Test
     fun sendsNothingWhenWatchappOpensWhileIdle() = runTest {
         val f = fixture()
-        f.syncer.onWatchOpened()
+        f.transport.watchOpenFlow.value = true
         runCurrent()
         assertEquals(0, f.transport.sends.size)
     }
@@ -82,7 +93,7 @@ class NavSyncerTest {
     fun sendsFullStateWhenWatchappOpens() = runTest {
         val f = fixture()
         f.syncer.onNavState(nav())
-        f.syncer.onWatchOpened()
+        f.transport.watchOpenFlow.value = true
         runCurrent()
         assertEquals(1, f.transport.sends.size)
         assertEquals(7, f.transport.sends[0].second.size)
@@ -91,7 +102,7 @@ class NavSyncerTest {
     @Test
     fun sendsOnlyChangedKeys() = runTest {
         val f = fixture()
-        f.syncer.onWatchOpened()
+        f.transport.watchOpenFlow.value = true
         f.syncer.onNavState(nav("150 м"))
         runCurrent()
         advanceTimeBy(1_000)
@@ -104,7 +115,7 @@ class NavSyncerTest {
     @Test
     fun identicalRepeatsAreNotSent() = runTest {
         val f = fixture()
-        f.syncer.onWatchOpened()
+        f.transport.watchOpenFlow.value = true
         f.syncer.onNavState(nav())
         runCurrent()
         repeat(5) {
@@ -118,7 +129,7 @@ class NavSyncerTest {
     @Test
     fun throttlesToOnePerSecondAndSendsTheLatest() = runTest {
         val f = fixture()
-        f.syncer.onWatchOpened()
+        f.transport.watchOpenFlow.value = true
         f.syncer.onNavState(nav("150 м"))
         runCurrent()
         f.syncer.onNavState(nav("100 м"))
@@ -141,12 +152,12 @@ class NavSyncerTest {
     fun resendsEverythingWhenWatchappReopens() = runTest {
         val f = fixture()
         f.syncer.onNavState(nav())
-        f.syncer.onWatchOpened()
+        f.transport.watchOpenFlow.value = true
         runCurrent()
-        f.syncer.onWatchClosed()
+        f.transport.watchOpenFlow.value = false
         runCurrent()
         advanceTimeBy(1_000)
-        f.syncer.onWatchOpened()
+        f.transport.watchOpenFlow.value = true
         runCurrent()
         assertEquals(2, f.transport.sends.size)
         assertEquals(7, f.transport.sends[1].second.size)
@@ -156,7 +167,7 @@ class NavSyncerTest {
     fun failedSendIsRetriedOnTheNextState() = runTest {
         val f = fixture()
         f.transport.sendResult = false
-        f.syncer.onWatchOpened()
+        f.transport.watchOpenFlow.value = true
         f.syncer.onNavState(nav())
         runCurrent()
         assertEquals(1, f.transport.sends.size)
@@ -172,7 +183,7 @@ class NavSyncerTest {
     @Test
     fun stopsWatchappFiveSecondsAfterNavigationEnds() = runTest {
         val f = fixture()
-        f.syncer.onWatchOpened()
+        f.transport.watchOpenFlow.value = true
         f.syncer.onNavState(nav())
         runCurrent()
         f.syncer.onNavState(NavState.IDLE)
