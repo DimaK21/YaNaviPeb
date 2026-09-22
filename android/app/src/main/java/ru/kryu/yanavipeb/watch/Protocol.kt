@@ -6,6 +6,9 @@ import java.util.UUID
 object Protocol {
     val WATCHAPP_UUID: UUID = UUID.fromString("2fa3743c-bafc-4d0c-b784-188e1bee90b8")
 
+    /** Package of the official Pebble companion app (coredevices.coreapp). */
+    const val PEBBLE_APP_PACKAGE = "coredevices.coreapp"
+
     const val KEY_STATE = 10000u
     const val KEY_DISTANCE = 10001u
     const val KEY_MANEUVER = 10002u
