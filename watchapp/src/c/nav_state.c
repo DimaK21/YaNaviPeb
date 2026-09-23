@@ -1,9 +1,15 @@
 #include "nav_state.h"
+#include "utf8_util.h"
 
 static bool copy_string(char *dst, size_t dst_size, const Tuple *tuple) {
   if (!tuple || tuple->type != TUPLE_CSTRING) return false;
-  strncpy(dst, tuple->value->cstring, dst_size - 1);
-  dst[dst_size - 1] = '\0';
+  // strncpy() would cut at a raw byte offset and could split a multi-byte UTF-8 codepoint in
+  // half, leaving an invalid sequence that renders as a blank TextLayer. The phone already
+  // truncates UTF-8-safely before sending (see truncateUtf8() in NavMessage.kt), so this only
+  // guards against a source string that is unexpectedly longer than the field's buffer.
+  size_t copy_len = utf8_safe_truncate_len(tuple->value->cstring, dst_size - 1);
+  memcpy(dst, tuple->value->cstring, copy_len);
+  dst[copy_len] = '\0';
   return true;
 }
 

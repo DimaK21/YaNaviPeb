@@ -1,7 +1,7 @@
 {
   "name": "yanavipeb-watchapp",
   "author": "kryu",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "keywords": ["pebble-app"],
   "private": true,
   "dependencies": {},
@@ -11,7 +11,13 @@
     "sdkVersion": "3",
     "enableMultiJS": true,
     "targetPlatforms": [
-      "emery"
+      "aplite",
+      "basalt",
+      "chalk",
+      "diorite",
+      "flint",
+      "emery",
+      "gabbro"
     ],
     "watchapp": {
       "watchface": false

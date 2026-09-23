@@ -1,12 +1,12 @@
 <resources>
-    <string name="app_name">YaNaviPeb</string>
-    <string name="status_listener_on">Доступ к уведомлениям: включён</string>
-    <string name="status_listener_off">Доступ к уведомлениям: выключен</string>
-    <string name="status_pebble_on">Приложение Pebble: найдено</string>
-    <string name="status_pebble_off">Приложение Pebble: не найдено</string>
-    <string name="open_access">Открыть настройки доступа к уведомлениям</string>
-    <string name="battery_hint">Чтобы навигация работала в фоне, отключите оптимизацию батареи для YaNaviPeb и для приложения Pebble.</string>
-    <string name="demo_start">Запустить демо на часах</string>
-    <string name="demo_stop">Остановить демо</string>
-    <string name="demo_hint">Демо отправляет на часы записанный маршрут. Не запускайте его во время навигации в Яндекс Картах.</string>
+    <string name="app_name" translatable="false">YaNaviPeb</string>
+    <string name="status_listener_on">Notification access: on</string>
+    <string name="status_listener_off">Notification access: off</string>
+    <string name="status_pebble_on">Pebble app: found</string>
+    <string name="status_pebble_off">Pebble app: not found</string>
+    <string name="open_access">Open notification access settings</string>
+    <string name="battery_hint">For navigation to keep working in the background, disable battery optimization for YaNaviPeb and for the Pebble app.</string>
+    <string name="demo_start">Start watch demo</string>
+    <string name="demo_stop">Stop demo</string>
+    <string name="demo_hint">The demo sends a recorded route to the watch. Do not run it while navigating in Yandex Maps or Yandex Navigator.</string>
 </resources>

@@ -26,7 +26,11 @@ The project has two parts:
 
 - **Android app** (`android/`) reads the Yandex Maps notification with a `NotificationListenerService`,
   extracts the distance, maneuver, arrival time, remaining distance and time, and the maneuver icon,
-  and sends only the changed fields to the watch, at most once per second.
+  and sends only the changed fields to the watch, at most once per second. The fields are read
+  from the notification's custom layout: the app inflates its `RemoteViews` and finds the fields by
+  their view resource names (`titleView`, `remainingDistanceView`, `timeOfArrivalView`,
+  `primaryIconTinted` and so on). If the distance or the maneuver view is missing, the notification's
+  standard title and text are used instead.
 - **Watchapp** (`watchapp/`, C, Pebble SDK) receives the data over AppMessage and draws the screen.
 
 Communication goes through the official Pebble phone app (`coredevices.coreapp`) and the
@@ -36,10 +40,13 @@ Yandex Maps shows is supported.
 
 ## Requirements
 
-- Pebble Time 2 (`emery` platform). Other Pebble models are not supported.
+- A Pebble watch. Tested on Pebble Time 2 (`emery`); the watchapp also builds with an adaptive
+  layout for every other Pebble SDK platform (`aplite`, `basalt`, `chalk`, `diorite`, `flint`,
+  `gabbro`), but only `emery` has been verified on real hardware.
 - Android 11 or newer with the Pebble app (`coredevices.coreapp`).
-- Yandex Maps (`ru.yandex.yandexmaps`). Yandex Navigator does not work: its notification has no
-  maneuver data.
+- Yandex Maps (`ru.yandex.yandexmaps`), or Yandex Navigator (`ru.yandex.yandexnavi`) with its
+  "Фоновая навигация" (background navigation) setting enabled — without it, Navigator's
+  notification has no maneuver data.
 - A language pack with Cyrillic on the watch, e.g. "Кириллица (для уведомлений)" from the Pebble app.
 
 ## Installation
@@ -77,11 +84,10 @@ Install `build/watchapp.pbw` on the watch: open the file on the phone with the P
 
 ### Phone setup
 
-1. Open YaNaviPeb and tap "Открыть настройки доступа к уведомлениям" (notification access
-   settings). Grant access.
+1. Open YaNaviPeb and tap "Open notification access settings". Grant access.
 2. Disable battery optimization for YaNaviPeb and for the Pebble app, otherwise the system may stop
    them in the background.
-3. Test the connection without driving: "Запустить демо на часах" (start demo) plays a recorded route
+3. Test the connection without driving: "Start watch demo" plays a recorded route
    on the watch. Do not run the demo during real navigation.
 
 After that, just start a route in Yandex Maps.
@@ -91,7 +97,7 @@ After that, just start a route in Yandex Maps.
 - Street names and traffic lights are not shown: the Yandex Maps notification does not contain them.
 - The Yandex Maps notification format is undocumented and may change with a Maps update. If the watch
   stops receiving data, check this first.
-- Only one phone–watch pair and only the `emery` platform are supported.
+- Only one phone–watch pair is supported.
 
 ## Development
 
@@ -102,7 +108,6 @@ android/                  Android app (Kotlin, View Binding)
   app/src/main/.../demo/    recorded route for the demo mode
 watchapp/                 watchapp (C, Pebble SDK)
   tools/                    appinfo patch, sample messages for the emulator
-spike-notification-dump/  tool for inspecting notification formats (built without Gradle)
 ```
 
 Android unit tests:
@@ -132,7 +137,7 @@ they match.
 | Key | ID | Type | Max bytes | Example |
 |---|---|---|---|---|
 | `STATE` | 10000 | uint8 | 1 | `0` — no navigation, `1` — navigating |
-| `DISTANCE` | 10001 | string | 15 | `150 м` |
+| `DISTANCE` | 10001 | string | 32 | `150 м`, or an arrival phrase like `Почти на месте` |
 | `MANEUVER` | 10002 | string | 48 | `Поверните направо` |
 | `REMAINING` | 10003 | string | 15 | `1,61 км` |
 | `ETA` | 10004 | string | 7 | `23:57` |

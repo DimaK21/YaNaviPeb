@@ -1,0 +1,52 @@
+<resources>
+    <string-array name="demo_maneuvers">
+        <item>Поверните направо</item>
+        <item>Поверните направо</item>
+        <item>Поверните направо</item>
+        <item>Поверните направо</item>
+        <item>Поверните налево</item>
+        <item>Поверните налево</item>
+        <item>Поверните налево</item>
+        <item>Поверните направо</item>
+    </string-array>
+    <string-array name="demo_distances">
+        <item>300 м</item>
+        <item>200 м</item>
+        <item>100 м</item>
+        <item>30 м</item>
+        <item>1,2 км</item>
+        <item>400 м</item>
+        <item>50 м</item>
+        <item>800 м</item>
+    </string-array>
+    <string-array name="demo_remaining">
+        <item>5 км</item>
+        <item>4,9 км</item>
+        <item>4,8 км</item>
+        <item>4,7 км</item>
+        <item>3,5 км</item>
+        <item>2,7 км</item>
+        <item>2,3 км</item>
+        <item>6,2 км</item>
+    </string-array>
+    <string-array name="demo_eta">
+        <item>23:53</item>
+        <item>23:53</item>
+        <item>23:53</item>
+        <item>23:52</item>
+        <item>23:52</item>
+        <item>23:51</item>
+        <item>23:51</item>
+        <item>01:09</item>
+    </string-array>
+    <string-array name="demo_durations">
+        <item>11 мин</item>
+        <item>11 мин</item>
+        <item>11 мин</item>
+        <item>10 мин</item>
+        <item>9 мин</item>
+        <item>8 мин</item>
+        <item>7 мин</item>
+        <item>1 ч 17 мин</item>
+    </string-array>
+</resources>

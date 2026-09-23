@@ -13,6 +13,11 @@ import ru.kryu.yanavipeb.nav.NavState
  * what changed, at most once per [minIntervalMs], and resends everything when the watchapp reopens.
  * [now] is a monotonic clock in milliseconds. Whether the watchapp is open comes from
  * [WatchTransport.watchappOpen], collected for the lifetime of this instance.
+ *
+ * A transition to not-navigating is only applied after [stopDelayMs]: Yandex Maps cancels its
+ * navigation notification (and briefly stops reporting) whenever its own app comes to the
+ * foreground, not just when navigation actually ends, so an immediate flush would flash a false
+ * "navigation finished" on the watch every time the user glances at the phone.
  */
 class NavSyncer(
     private val transport: WatchTransport,
@@ -62,7 +67,6 @@ class NavSyncer(
             if (!wasNavigating) transport.startApp()
             flush()
         } else if (wasNavigating) {
-            flush()
             scheduleStop()
         }
     }
@@ -99,7 +103,12 @@ class NavSyncer(
         stopJob?.cancel()
         stopJob = scope.launch {
             delay(stopDelayMs)
-            lock.withLock { if (!current.navigating) transport.stopApp() }
+            lock.withLock {
+                if (!current.navigating) {
+                    flush()
+                    transport.stopApp()
+                }
+            }
         }
     }
 }

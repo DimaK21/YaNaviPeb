@@ -8,7 +8,7 @@ import android.util.Log
 import ru.kryu.yanavipeb.BuildConfig
 import ru.kryu.yanavipeb.NavRuntime
 
-/** Feeds every Yandex Maps navigation notification into [NavRuntime]'s syncer. */
+/** Feeds every Yandex Maps / Yandex Navigator navigation notification into [NavRuntime]'s syncer. */
 class MapsNotificationListener : NotificationListenerService() {
     private val reader by lazy { NotificationSnapshotReader(applicationContext) }
     private var lastLogged: NavState? = null
@@ -41,13 +41,16 @@ class MapsNotificationListener : NotificationListenerService() {
     }
 
     private fun isNavigation(sbn: StatusBarNotification): Boolean =
-        sbn.packageName == MAPS_PACKAGE &&
+        sbn.packageName in SUPPORTED_PACKAGES &&
             sbn.id == NOTIFICATION_ID &&
             sbn.notification.category == Notification.CATEGORY_NAVIGATION
 
     private companion object {
         const val TAG = "NavListener"
-        const val MAPS_PACKAGE = "ru.yandex.yandexmaps"
+
+        // Yandex Navigator only posts this notification while its "Фоновая навигация"
+        // (background navigation) setting is enabled; otherwise it has no maneuver data.
+        val SUPPORTED_PACKAGES = setOf("ru.yandex.yandexmaps", "ru.yandex.yandexnavi")
         const val NOTIFICATION_ID = 2
     }
 }
