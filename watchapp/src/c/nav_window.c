@@ -27,7 +27,7 @@ static bool is_russian_locale(void) {
 
 static void icon_update_proc(Layer *layer, GContext *ctx) {
   if (!s_state->has_icon) return;
-  graphics_context_set_fill_color(ctx, GColorWhite);
+  graphics_context_set_fill_color(ctx, GColorBlack);
   for (int y = 0; y < ICON_SIZE; y++) {
     int x = 0;
     while (x < ICON_SIZE) {
@@ -50,7 +50,7 @@ static void divider_update_proc(Layer *layer, GContext *ctx) {
 static TextLayer *make_text(Layer *root, GRect frame, const char *font_key, GTextAlignment align) {
   TextLayer *layer = text_layer_create(frame);
   text_layer_set_background_color(layer, GColorClear);
-  text_layer_set_text_color(layer, GColorWhite);
+  text_layer_set_text_color(layer, GColorBlack);
   text_layer_set_font(layer, fonts_get_system_font(font_key));
   text_layer_set_text_alignment(layer, align);
   layer_add_child(root, text_layer_get_layer(layer));
@@ -94,7 +94,7 @@ static void window_unload(Window *window) {
 void nav_window_push(NavState *state) {
   s_state = state;
   s_window = window_create();
-  window_set_background_color(s_window, GColorBlack);
+  window_set_background_color(s_window, GColorWhite);
   window_set_window_handlers(s_window, (WindowHandlers){.load = window_load, .unload = window_unload});
   window_stack_push(s_window, true);
 }
