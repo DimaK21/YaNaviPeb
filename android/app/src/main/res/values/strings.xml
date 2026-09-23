@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">YaNaviPeb</string>
+    <string name="app_name" translatable="false">YaNaviPeb</string>
     <string name="status_listener_on">Notification access: on</string>
     <string name="status_listener_off">Notification access: off</string>
     <string name="status_pebble_on">Pebble app: found</string>
