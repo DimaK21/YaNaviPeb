@@ -1,12 +1,10 @@
 package ru.kryu.yanavipeb
 
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.provider.Settings
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.NotificationManagerCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import kotlinx.coroutines.Job
@@ -16,12 +14,12 @@ import kotlinx.coroutines.launch
 import ru.kryu.yanavipeb.databinding.ActivityMainBinding
 import ru.kryu.yanavipeb.demo.DemoPlayer
 import ru.kryu.yanavipeb.demo.DemoScript
-import ru.kryu.yanavipeb.watch.Protocol
+import ru.kryu.yanavipeb.nav.NotificationAccessChecker
+import ru.kryu.yanavipeb.nav.NotificationListenerAccessChecker
+import ru.kryu.yanavipeb.watch.PackageManagerPebbleAppChecker
+import ru.kryu.yanavipeb.watch.PebbleAppChecker
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityMainBinding
-    private val scope = MainScope()
-    private var demoJob: Job? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,22 +47,23 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
-    private fun refreshStatus() {
-        val listenerEnabled = NotificationManagerCompat.getEnabledListenerPackages(this).contains(packageName)
-        binding.listenerStatus.setText(
-            if (listenerEnabled) R.string.status_listener_on else R.string.status_listener_off,
-        )
-        binding.pebbleStatus.setText(
-            if (isPebbleInstalled()) R.string.status_pebble_on else R.string.status_pebble_off,
-        )
+    private val scope = MainScope()
+    private var demoJob: Job? = null
+    private lateinit var binding: ActivityMainBinding
+    private val notificationAccessChecker: NotificationAccessChecker by lazy {
+        NotificationListenerAccessChecker(applicationContext)
+    }
+    private val pebbleAppChecker: PebbleAppChecker by lazy {
+        PackageManagerPebbleAppChecker(applicationContext)
     }
 
-    @Suppress("DEPRECATION")
-    private fun isPebbleInstalled(): Boolean = try {
-        packageManager.getPackageInfo(Protocol.PEBBLE_APP_PACKAGE, 0)
-        true
-    } catch (e: PackageManager.NameNotFoundException) {
-        false
+    private fun refreshStatus() {
+        binding.listenerStatus.setText(
+            if (notificationAccessChecker.isEnabled()) R.string.status_listener_on else R.string.status_listener_off,
+        )
+        binding.pebbleStatus.setText(
+            if (pebbleAppChecker.isInstalled()) R.string.status_pebble_on else R.string.status_pebble_off,
+        )
     }
 
     private fun toggleDemo() {
@@ -81,5 +80,4 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
 }
