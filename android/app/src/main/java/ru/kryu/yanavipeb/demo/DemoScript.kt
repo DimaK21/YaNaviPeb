@@ -8,6 +8,16 @@ import ru.kryu.yanavipeb.watch.NavSyncer
 
 /** A short made-up route with the same kinds of strings Yandex Maps produces. */
 object DemoScript {
+    /**
+     * Which icon each demo step shows, in order. Deferred (not `ByteArray` directly) so a plain
+     * JVM test can check its length without calling [DemoIcons], which draws through
+     * `android.graphics` and needs a real Android runtime.
+     */
+    internal val DEMO_ICON_SEQUENCE: List<() -> ByteArray> = listOf(
+        { DemoIcons.right() }, { DemoIcons.right() }, { DemoIcons.right() }, { DemoIcons.right() },
+        { DemoIcons.left() }, { DemoIcons.left() }, { DemoIcons.left() }, { DemoIcons.right() },
+    )
+
     fun steps(context: Context): List<NavState> {
         val resources = context.resources
         return buildSteps(
@@ -16,10 +26,7 @@ object DemoScript {
             remaining = resources.getStringArray(R.array.demo_remaining),
             eta = resources.getStringArray(R.array.demo_eta),
             durations = resources.getStringArray(R.array.demo_durations),
-            icons = listOf(
-                DemoIcons.right(), DemoIcons.right(), DemoIcons.right(), DemoIcons.right(),
-                DemoIcons.left(), DemoIcons.left(), DemoIcons.left(), DemoIcons.right(),
-            ),
+            icons = DEMO_ICON_SEQUENCE.map { it() },
         )
     }
 
