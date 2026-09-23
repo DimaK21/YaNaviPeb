@@ -13,6 +13,7 @@ static TextLayer *s_maneuver_layer;
 static TextLayer *s_eta_layer;
 static TextLayer *s_summary_layer;  // remaining distance / duration
 static char s_summary[40];
+static int s_inner_width;
 
 static bool icon_bit(int x, int y) {
   return s_state->icon[y * (ICON_SIZE / 8) + x / 8] & (0x80 >> (x % 8));
@@ -47,6 +48,17 @@ static void divider_update_proc(Layer *layer, GContext *ctx) {
   graphics_draw_line(ctx, GPoint(0, 0), GPoint(layer_get_bounds(layer).size.w, 0));
 }
 
+// GOTHIC_24 reads better than GOTHIC_18, but a long "remaining / duration" combination
+// (e.g. "6,2 км / 1 ч 17 мин") wraps to two lines at 24pt and would get clipped by the box
+// below it, so fall back to a smaller font when the text is too wide to fit on one line.
+static GFont choose_summary_font(const char *text) {
+  GFont big = fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD);
+  GSize natural = graphics_text_layout_get_content_size(
+      text, big, GRect(0, 0, 1000, 40), GTextOverflowModeFill, GTextAlignmentLeft);
+  if (natural.w <= s_inner_width) return big;
+  return fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD);
+}
+
 static TextLayer *make_text(Layer *root, GRect frame, const char *font_key, GTextAlignment align) {
   TextLayer *layer = text_layer_create(frame);
   text_layer_set_background_color(layer, GColorClear);
@@ -61,6 +73,7 @@ static void window_load(Window *window) {
   Layer *root = window_get_root_layer(window);
   int w = layer_get_bounds(root).size.w;
   int inner = w - 2 * MARGIN;
+  s_inner_width = inner;
 
   s_message_layer = make_text(root, GRect(MARGIN, 70, inner, 90), FONT_KEY_GOTHIC_28_BOLD, GTextAlignmentCenter);
 
@@ -75,8 +88,8 @@ static void window_load(Window *window) {
   layer_set_update_proc(s_divider_layer, divider_update_proc);
   layer_add_child(root, s_divider_layer);
 
-  s_eta_layer = make_text(root, GRect(MARGIN, 174, inner, 28), FONT_KEY_GOTHIC_24_BOLD, GTextAlignmentCenter);
-  s_summary_layer = make_text(root, GRect(MARGIN, 202, inner, 22), FONT_KEY_GOTHIC_18, GTextAlignmentCenter);
+  s_eta_layer = make_text(root, GRect(MARGIN, 173, inner, 26), FONT_KEY_GOTHIC_24_BOLD, GTextAlignmentCenter);
+  s_summary_layer = make_text(root, GRect(MARGIN, 199, inner, 28), FONT_KEY_GOTHIC_24, GTextAlignmentCenter);
 
   nav_window_refresh();
 }
@@ -127,6 +140,7 @@ void nav_window_refresh(void) {
   text_layer_set_text(s_distance_layer, s_state->distance);
   text_layer_set_text(s_maneuver_layer, s_state->maneuver);
   text_layer_set_text(s_eta_layer, s_state->eta);
+  text_layer_set_font(s_summary_layer, choose_summary_font(s_summary));
   text_layer_set_text(s_summary_layer, s_summary);
   layer_mark_dirty(s_icon_layer);
 }
