@@ -1,0 +1,52 @@
+<resources>
+    <string-array name="demo_maneuvers">
+        <item>Turn right</item>
+        <item>Turn right</item>
+        <item>Turn right</item>
+        <item>Turn right</item>
+        <item>Turn left</item>
+        <item>Turn left</item>
+        <item>Turn left</item>
+        <item>Turn right</item>
+    </string-array>
+    <string-array name="demo_distances">
+        <item>300 m</item>
+        <item>200 m</item>
+        <item>100 m</item>
+        <item>30 m</item>
+        <item>1.2 km</item>
+        <item>400 m</item>
+        <item>50 m</item>
+        <item>800 m</item>
+    </string-array>
+    <string-array name="demo_remaining">
+        <item>5 km</item>
+        <item>4.9 km</item>
+        <item>4.8 km</item>
+        <item>4.7 km</item>
+        <item>3.5 km</item>
+        <item>2.7 km</item>
+        <item>2.3 km</item>
+        <item>6.2 km</item>
+    </string-array>
+    <string-array name="demo_eta">
+        <item>23:53</item>
+        <item>23:53</item>
+        <item>23:53</item>
+        <item>23:52</item>
+        <item>23:52</item>
+        <item>23:51</item>
+        <item>23:51</item>
+        <item>01:09</item>
+    </string-array>
+    <string-array name="demo_durations">
+        <item>11 min</item>
+        <item>11 min</item>
+        <item>11 min</item>
+        <item>10 min</item>
+        <item>9 min</item>
+        <item>8 min</item>
+        <item>7 min</item>
+        <item>1 h 17 min</item>
+    </string-array>
+</resources>

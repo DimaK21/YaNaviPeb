@@ -81,11 +81,10 @@ Install `build/watchapp.pbw` on the watch: open the file on the phone with the P
 
 ### Phone setup
 
-1. Open YaNaviPeb and tap "Открыть настройки доступа к уведомлениям" (notification access
-   settings). Grant access.
+1. Open YaNaviPeb and tap "Open notification access settings". Grant access.
 2. Disable battery optimization for YaNaviPeb and for the Pebble app, otherwise the system may stop
    them in the background.
-3. Test the connection without driving: "Запустить демо на часах" (start demo) plays a recorded route
+3. Test the connection without driving: "Start watch demo" plays a recorded route
    on the watch. Do not run the demo during real navigation.
 
 After that, just start a route in Yandex Maps.
