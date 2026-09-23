@@ -8,6 +8,7 @@ static NavState *s_state;
 static Layer *s_icon_layer;
 static Layer *s_divider_layer;
 static TextLayer *s_message_layer;  // "start navigation" / "navigation finished"
+static TextLayer *s_hint_layer;  // caveat shown under "navigation finished" only
 static TextLayer *s_distance_layer;
 static TextLayer *s_maneuver_layer;
 static TextLayer *s_eta_layer;
@@ -76,6 +77,7 @@ static void window_load(Window *window) {
   s_inner_width = inner;
 
   s_message_layer = make_text(root, GRect(MARGIN, 70, inner, 90), FONT_KEY_GOTHIC_28_BOLD, GTextAlignmentCenter);
+  s_hint_layer = make_text(root, GRect(MARGIN, 162, inner, 40), FONT_KEY_GOTHIC_18, GTextAlignmentCenter);
 
   s_icon_layer = layer_create(GRect((w - ICON_SIZE) / 2, 4, ICON_SIZE, ICON_SIZE));
   layer_set_update_proc(s_icon_layer, icon_update_proc);
@@ -96,6 +98,7 @@ static void window_load(Window *window) {
 
 static void window_unload(Window *window) {
   text_layer_destroy(s_message_layer);
+  text_layer_destroy(s_hint_layer);
   text_layer_destroy(s_distance_layer);
   text_layer_destroy(s_maneuver_layer);
   text_layer_destroy(s_eta_layer);
@@ -126,11 +129,21 @@ void nav_window_refresh(void) {
 
   if (!navigating) {
     bool ru = is_russian_locale();
-    text_layer_set_text(s_message_layer, s_state->finished
+    bool finished = s_state->finished;
+    // Yandex Maps cancels its notification both when a route actually ends and whenever its own
+    // app is opened in the foreground for more than NavSyncer's debounce window, so "finished"
+    // cannot be told apart from "the phone app is open" — the hint says so instead of asserting
+    // an end that may not have happened.
+    text_layer_set_text(s_message_layer, finished
         ? (ru ? "Навигация завершена" : "Navigation finished")
-        : (ru ? "Ожидание навигации" : "Waiting for navigation"));
+        : (ru ? "Ожидание фоновой навигации" : "Waiting for background navigation"));
+    layer_set_hidden(text_layer_get_layer(s_hint_layer), !finished);
+    if (finished) {
+      text_layer_set_text(s_hint_layer, ru ? "или открыты Карты" : "or Maps app is open");
+    }
     return;
   }
+  layer_set_hidden(text_layer_get_layer(s_hint_layer), true);
 
   if (s_state->remaining[0] && s_state->duration[0]) {
     snprintf(s_summary, sizeof(s_summary), "%s / %s", s_state->remaining, s_state->duration);
