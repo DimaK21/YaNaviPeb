@@ -40,7 +40,9 @@ Yandex Maps shows is supported.
 
 ## Requirements
 
-- Pebble Time 2 (`emery` platform). Other Pebble models are not supported.
+- A Pebble watch. Tested on Pebble Time 2 (`emery`); the watchapp also builds with an adaptive
+  layout for every other Pebble SDK platform (`aplite`, `basalt`, `chalk`, `diorite`, `flint`,
+  `gabbro`), but only `emery` has been verified on real hardware.
 - Android 11 or newer with the Pebble app (`coredevices.coreapp`).
 - Yandex Maps (`ru.yandex.yandexmaps`), or Yandex Navigator (`ru.yandex.yandexnavi`) with its
   "Фоновая навигация" (background navigation) setting enabled — without it, Navigator's
@@ -95,7 +97,7 @@ After that, just start a route in Yandex Maps.
 - Street names and traffic lights are not shown: the Yandex Maps notification does not contain them.
 - The Yandex Maps notification format is undocumented and may change with a Maps update. If the watch
   stops receiving data, check this first.
-- Only one phone–watch pair and only the `emery` platform are supported.
+- Only one phone–watch pair is supported.
 
 ## Development
 
