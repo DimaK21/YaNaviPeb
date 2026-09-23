@@ -8,11 +8,13 @@ static NavState *s_state;
 static Layer *s_icon_layer;
 static Layer *s_divider_layer;
 static TextLayer *s_message_layer;  // "start navigation" / "navigation finished"
+static TextLayer *s_hint_layer;  // caveat shown under "navigation finished" only
 static TextLayer *s_distance_layer;
 static TextLayer *s_maneuver_layer;
 static TextLayer *s_eta_layer;
 static TextLayer *s_summary_layer;  // remaining distance / duration
 static char s_summary[40];
+static int s_inner_width;
 
 static bool icon_bit(int x, int y) {
   return s_state->icon[y * (ICON_SIZE / 8) + x / 8] & (0x80 >> (x % 8));
@@ -47,6 +49,17 @@ static void divider_update_proc(Layer *layer, GContext *ctx) {
   graphics_draw_line(ctx, GPoint(0, 0), GPoint(layer_get_bounds(layer).size.w, 0));
 }
 
+// GOTHIC_24 reads better than GOTHIC_18, but a long "remaining / duration" combination
+// (e.g. "6,2 км / 1 ч 17 мин") wraps to two lines at 24pt and would get clipped by the box
+// below it, so fall back to a smaller font when the text is too wide to fit on one line.
+static GFont choose_summary_font(const char *text) {
+  GFont big = fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD);
+  GSize natural = graphics_text_layout_get_content_size(
+      text, big, GRect(0, 0, 1000, 40), GTextOverflowModeFill, GTextAlignmentLeft);
+  if (natural.w <= s_inner_width) return big;
+  return fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD);
+}
+
 static TextLayer *make_text(Layer *root, GRect frame, const char *font_key, GTextAlignment align) {
   TextLayer *layer = text_layer_create(frame);
   text_layer_set_background_color(layer, GColorClear);
@@ -61,8 +74,10 @@ static void window_load(Window *window) {
   Layer *root = window_get_root_layer(window);
   int w = layer_get_bounds(root).size.w;
   int inner = w - 2 * MARGIN;
+  s_inner_width = inner;
 
   s_message_layer = make_text(root, GRect(MARGIN, 70, inner, 90), FONT_KEY_GOTHIC_28_BOLD, GTextAlignmentCenter);
+  s_hint_layer = make_text(root, GRect(MARGIN, 162, inner, 40), FONT_KEY_GOTHIC_18, GTextAlignmentCenter);
 
   s_icon_layer = layer_create(GRect((w - ICON_SIZE) / 2, 4, ICON_SIZE, ICON_SIZE));
   layer_set_update_proc(s_icon_layer, icon_update_proc);
@@ -75,14 +90,15 @@ static void window_load(Window *window) {
   layer_set_update_proc(s_divider_layer, divider_update_proc);
   layer_add_child(root, s_divider_layer);
 
-  s_eta_layer = make_text(root, GRect(MARGIN, 174, inner, 28), FONT_KEY_GOTHIC_24_BOLD, GTextAlignmentCenter);
-  s_summary_layer = make_text(root, GRect(MARGIN, 202, inner, 22), FONT_KEY_GOTHIC_18, GTextAlignmentCenter);
+  s_eta_layer = make_text(root, GRect(MARGIN, 173, inner, 26), FONT_KEY_GOTHIC_24_BOLD, GTextAlignmentCenter);
+  s_summary_layer = make_text(root, GRect(MARGIN, 199, inner, 28), FONT_KEY_GOTHIC_24, GTextAlignmentCenter);
 
   nav_window_refresh();
 }
 
 static void window_unload(Window *window) {
   text_layer_destroy(s_message_layer);
+  text_layer_destroy(s_hint_layer);
   text_layer_destroy(s_distance_layer);
   text_layer_destroy(s_maneuver_layer);
   text_layer_destroy(s_eta_layer);
@@ -113,11 +129,21 @@ void nav_window_refresh(void) {
 
   if (!navigating) {
     bool ru = is_russian_locale();
-    text_layer_set_text(s_message_layer, s_state->finished
+    bool finished = s_state->finished;
+    // Yandex Maps cancels its notification both when a route actually ends and whenever its own
+    // app is opened in the foreground for more than NavSyncer's debounce window, so "finished"
+    // cannot be told apart from "the phone app is open" — the hint says so instead of asserting
+    // an end that may not have happened.
+    text_layer_set_text(s_message_layer, finished
         ? (ru ? "Навигация завершена" : "Navigation finished")
-        : (ru ? "Ожидание навигации" : "Waiting for navigation"));
+        : (ru ? "Ожидание фоновой навигации" : "Waiting for background navigation"));
+    layer_set_hidden(text_layer_get_layer(s_hint_layer), !finished);
+    if (finished) {
+      text_layer_set_text(s_hint_layer, ru ? "или открыты Карты" : "or Maps app is open");
+    }
     return;
   }
+  layer_set_hidden(text_layer_get_layer(s_hint_layer), true);
 
   if (s_state->remaining[0] && s_state->duration[0]) {
     snprintf(s_summary, sizeof(s_summary), "%s / %s", s_state->remaining, s_state->duration);
@@ -127,6 +153,7 @@ void nav_window_refresh(void) {
   text_layer_set_text(s_distance_layer, s_state->distance);
   text_layer_set_text(s_maneuver_layer, s_state->maneuver);
   text_layer_set_text(s_eta_layer, s_state->eta);
+  text_layer_set_font(s_summary_layer, choose_summary_font(s_summary));
   text_layer_set_text(s_summary_layer, s_summary);
   layer_mark_dirty(s_icon_layer);
 }
