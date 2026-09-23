@@ -51,7 +51,40 @@ Yandex Maps shows is supported.
 
 ## Installation
 
-There are no prebuilt releases yet; both apps are built from source.
+Download `app-release.apk` (Android app) and `watchapp.pbw` (watchapp) from the
+[latest release](https://github.com/DimaK21/YaNaviPeb/releases/latest), or
+[build them from source](#building-from-source).
+
+1. Install `app-release.apk` on the phone. The app reads notifications and is installed outside
+   Google Play, so the system may block it; see [Troubleshooting](#troubleshooting).
+2. Install `watchapp.pbw` on the watch: open the file on the phone with the Pebble app.
+3. Follow the phone setup below.
+
+### Phone setup
+
+1. Open YaNaviPeb and tap "Open notification access settings". Grant access. If the switch is
+   greyed out, see [Troubleshooting](#troubleshooting).
+2. Disable battery optimization for YaNaviPeb and for the Pebble app, otherwise the system may stop
+   them in the background.
+3. Test the connection without driving: "Start watch demo" plays a recorded route
+   on the watch. Do not run the demo during real navigation.
+
+After that, just start a route in Yandex Maps.
+
+### Troubleshooting
+
+- **Play Protect blocks the install ("App blocked to protect your device").** Google Play Protect
+  blocks apps installed outside Google Play that can ask for sensitive access, such as notification
+  access. Install from a computer with `adb install -r app-release.apk`, or temporarily turn off
+  "Scan apps with Play Protect" (Play Store → profile icon → Play Protect → settings) and turn it
+  back on afterwards.
+- **The notification access switch is greyed out ("Restricted setting").** Android restricts
+  sensitive permissions of apps installed outside Google Play. Open Settings → Apps → YaNaviPeb →
+  the ⋮ menu → "Allow restricted settings", then grant notification access again.
+
+Menu names vary between Android versions and vendors.
+
+## Building from source
 
 ### Android app
 
@@ -81,16 +114,6 @@ Pebble app does not allow the Android app to send data to the watch.
 
 Install `build/watchapp.pbw` on the watch: open the file on the phone with the Pebble app, or run
 `pebble install --phone <phone IP>` with Developer Connection enabled.
-
-### Phone setup
-
-1. Open YaNaviPeb and tap "Open notification access settings". Grant access.
-2. Disable battery optimization for YaNaviPeb and for the Pebble app, otherwise the system may stop
-   them in the background.
-3. Test the connection without driving: "Start watch demo" plays a recorded route
-   on the watch. Do not run the demo during real navigation.
-
-After that, just start a route in Yandex Maps.
 
 ## Limitations
 
