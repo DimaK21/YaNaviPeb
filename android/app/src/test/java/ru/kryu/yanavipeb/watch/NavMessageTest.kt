@@ -69,6 +69,12 @@ class NavMessageTest {
     }
 
     @Test
+    fun arrivalPhraseIsNotTruncated() {
+        val message = NavMessage.diff(null, nav(distance = "Почти на месте"))
+        assertEquals(PebbleDictionaryItem.Text("Почти на месте"), message[Protocol.KEY_DISTANCE])
+    }
+
+    @Test
     fun longTextIsTruncatedAtCharacterBoundary() {
         val message = NavMessage.diff(null, nav(maneuver = "ab" + "я".repeat(30)))
         assertEquals(PebbleDictionaryItem.Text("ab" + "я".repeat(23)), message[Protocol.KEY_MANEUVER])

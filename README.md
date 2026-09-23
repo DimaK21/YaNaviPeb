@@ -135,7 +135,7 @@ they match.
 | Key | ID | Type | Max bytes | Example |
 |---|---|---|---|---|
 | `STATE` | 10000 | uint8 | 1 | `0` — no navigation, `1` — navigating |
-| `DISTANCE` | 10001 | string | 15 | `150 м` |
+| `DISTANCE` | 10001 | string | 32 | `150 м`, or an arrival phrase like `Почти на месте` |
 | `MANEUVER` | 10002 | string | 48 | `Поверните направо` |
 | `REMAINING` | 10003 | string | 15 | `1,61 км` |
 | `ETA` | 10004 | string | 7 | `23:57` |
