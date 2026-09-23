@@ -29,7 +29,9 @@ object Protocol {
     )
 
     /** Maximum UTF-8 length of each string, without the terminating NUL. */
-    const val MAX_DISTANCE_BYTES = 15
+    // Usually a short reading ("650 м"), but Yandex Maps also puts arrival phrases here near the
+    // destination ("Почти на месте", 26 bytes; "Вы на месте", 20 bytes).
+    const val MAX_DISTANCE_BYTES = 32
     const val MAX_MANEUVER_BYTES = 48
     const val MAX_REMAINING_BYTES = 15
     const val MAX_ETA_BYTES = 7

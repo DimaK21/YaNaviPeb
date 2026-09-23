@@ -8,7 +8,8 @@
 typedef struct {
   bool navigating;  // STATE == 1
   bool finished;    // navigation ended while the watchapp was open
-  char distance[16];
+  char distance[33];  // usually a short reading ("650 м"), but Yandex Maps also puts arrival
+                       // phrases here near the destination ("Почти на месте", "Вы на месте")
   char maneuver[49];
   char remaining[16];
   char eta[8];

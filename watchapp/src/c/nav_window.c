@@ -49,15 +49,29 @@ static void divider_update_proc(Layer *layer, GContext *ctx) {
   graphics_draw_line(ctx, GPoint(0, 0), GPoint(layer_get_bounds(layer).size.w, 0));
 }
 
-// GOTHIC_24 reads better than GOTHIC_18, but a long "remaining / duration" combination
-// (e.g. "6,2 км / 1 ч 17 мин") wraps to two lines at 24pt and would get clipped by the box
-// below it, so fall back to a smaller font when the text is too wide to fit on one line.
-static GFont choose_summary_font(const char *text) {
-  GFont big = fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD);
+// A single-line box wraps to two lines when its text is too wide, and the second line gets
+// clipped by whatever sits below the box, so fall back to a smaller font when the big one
+// doesn't fit on one line.
+static GFont choose_fitting_font(const char *text, const char *big_key, const char *small_key) {
+  GFont big = fonts_get_system_font(big_key);
   GSize natural = graphics_text_layout_get_content_size(
       text, big, GRect(0, 0, 1000, 40), GTextOverflowModeFill, GTextAlignmentLeft);
   if (natural.w <= s_inner_width) return big;
-  return fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD);
+  return fonts_get_system_font(small_key);
+}
+
+// GOTHIC_24 reads better than GOTHIC_18, but a long "remaining / duration" combination
+// (e.g. "6,2 км / 1 ч 17 мин") wraps to two lines at 24pt and would get clipped by the box
+// below it.
+static GFont choose_summary_font(const char *text) {
+  return choose_fitting_font(text, FONT_KEY_GOTHIC_24_BOLD, FONT_KEY_GOTHIC_18_BOLD);
+}
+
+// GOTHIC_28 reads better than GOTHIC_18, but Yandex Maps also puts arrival phrases here
+// ("Почти на месте", "Вы на месте") instead of a short numeric distance, and those wrap to a
+// second line that the maneuver box below clips.
+static GFont choose_distance_font(const char *text) {
+  return choose_fitting_font(text, FONT_KEY_GOTHIC_28_BOLD, FONT_KEY_GOTHIC_18_BOLD);
 }
 
 static TextLayer *make_text(Layer *root, GRect frame, const char *font_key, GTextAlignment align) {
@@ -150,6 +164,7 @@ void nav_window_refresh(void) {
   } else {
     snprintf(s_summary, sizeof(s_summary), "%s%s", s_state->remaining, s_state->duration);
   }
+  text_layer_set_font(s_distance_layer, choose_distance_font(s_state->distance));
   text_layer_set_text(s_distance_layer, s_state->distance);
   text_layer_set_text(s_maneuver_layer, s_state->maneuver);
   text_layer_set_text(s_eta_layer, s_state->eta);
