@@ -3,6 +3,7 @@ package ru.kryu.yanavipeb
 import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
+import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -58,12 +59,24 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun refreshStatus() {
-        binding.listenerStatus.setText(
-            if (notificationAccessChecker.isEnabled()) R.string.status_listener_on else R.string.status_listener_off,
+        updateStatusRow(
+            binding.listenerStatus,
+            notificationAccessChecker.isEnabled(),
+            R.string.status_listener_on,
+            R.string.status_listener_off,
         )
-        binding.pebbleStatus.setText(
-            if (pebbleAppChecker.isInstalled()) R.string.status_pebble_on else R.string.status_pebble_off,
+        updateStatusRow(
+            binding.pebbleStatus,
+            pebbleAppChecker.isInstalled(),
+            R.string.status_pebble_on,
+            R.string.status_pebble_off,
         )
+    }
+
+    private fun updateStatusRow(view: TextView, ok: Boolean, onText: Int, offText: Int) {
+        view.setText(if (ok) onText else offText)
+        val icon = if (ok) R.drawable.ic_status_ok else R.drawable.ic_status_warning
+        view.setCompoundDrawablesRelativeWithIntrinsicBounds(icon, 0, 0, 0)
     }
 
     private fun toggleDemo() {
