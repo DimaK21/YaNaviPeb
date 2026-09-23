@@ -15,6 +15,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import ru.kryu.yanavipeb.databinding.ActivityMainBinding
 import ru.kryu.yanavipeb.demo.DemoPlayer
+import ru.kryu.yanavipeb.demo.DemoScript
 import ru.kryu.yanavipeb.watch.Protocol
 
 class MainActivity : AppCompatActivity() {
@@ -74,7 +75,7 @@ class MainActivity : AppCompatActivity() {
         binding.demoButton.setText(R.string.demo_stop)
         demoJob = scope.launch {
             try {
-                DemoPlayer.play(NavRuntime.syncer(applicationContext))
+                DemoPlayer.play(NavRuntime.syncer(applicationContext), DemoScript.steps(applicationContext))
             } finally {
                 binding.demoButton.setText(R.string.demo_start)
             }
