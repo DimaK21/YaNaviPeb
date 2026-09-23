@@ -1,6 +1,6 @@
 package ru.kryu.yanavipeb.nav
 
-/** What we read from one Yandex Maps notification, free of Android types so it can be parsed in tests. */
+/** What we read from one Yandex Maps / Yandex Navigator notification, free of Android types so it can be parsed in tests. */
 class NotificationSnapshot(
     val title: String?,
     val text: String?,

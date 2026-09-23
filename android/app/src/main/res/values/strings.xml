@@ -8,5 +8,5 @@
     <string name="battery_hint">For navigation to keep working in the background, disable battery optimization for YaNaviPeb and for the Pebble app.</string>
     <string name="demo_start">Start watch demo</string>
     <string name="demo_stop">Stop demo</string>
-    <string name="demo_hint">The demo sends a recorded route to the watch. Do not run it while navigating in Yandex Maps.</string>
+    <string name="demo_hint">The demo sends a recorded route to the watch. Do not run it while navigating in Yandex Maps or Yandex Navigator.</string>
 </resources>

@@ -14,7 +14,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import ru.kryu.yanavipeb.watch.Protocol
 
-/** Turns a Yandex Maps notification into a [NotificationSnapshot]. Call it on the main thread. */
+/** Turns a Yandex Maps / Yandex Navigator notification into a [NotificationSnapshot]. Call it on the main thread. */
 class NotificationSnapshotReader(private val context: Context) {
 
     fun read(sbn: StatusBarNotification): NotificationSnapshot {

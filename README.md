@@ -42,8 +42,9 @@ Yandex Maps shows is supported.
 
 - Pebble Time 2 (`emery` platform). Other Pebble models are not supported.
 - Android 11 or newer with the Pebble app (`coredevices.coreapp`).
-- Yandex Maps (`ru.yandex.yandexmaps`). Yandex Navigator does not work: its notification has no
-  maneuver data.
+- Yandex Maps (`ru.yandex.yandexmaps`), or Yandex Navigator (`ru.yandex.yandexnavi`) with its
+  "Фоновая навигация" (background navigation) setting enabled — without it, Navigator's
+  notification has no maneuver data.
 - A language pack with Cyrillic on the watch, e.g. "Кириллица (для уведомлений)" from the Pebble app.
 
 ## Installation
