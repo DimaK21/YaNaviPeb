@@ -18,60 +18,6 @@ import java.util.UUID
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class PebbleActiveAppObserverTest {
-    /** Fails the way the real provider does while the Pebble app is missing: with [SecurityException]. */
-    private class FakeProvider : PebbleProvider {
-        var connectedWatch: WatchIdentifier? = null
-        var openApp: UUID? = null
-        var subscribeFails = false
-        var watchQueryFails = false
-        var activeAppQueryFails = false
-        var connectedWatchSubscriptions = 0
-
-        private val connectedWatchTicks = MutableStateFlow(0)
-        private val activeAppTicks = MutableStateFlow(0)
-
-        fun notifyConnectedWatchChanged() {
-            connectedWatchTicks.value++
-        }
-
-        fun notifyActiveAppChanged() {
-            activeAppTicks.value++
-        }
-
-        override fun connectedWatchChanges(): Flow<Unit> = changes(connectedWatchTicks) { connectedWatchSubscriptions++ }
-
-        override fun activeAppChanges(watch: WatchIdentifier): Flow<Unit> = changes(activeAppTicks)
-
-        override fun firstConnectedWatch(): WatchIdentifier? {
-            if (watchQueryFails) throw SecurityException("Permission Denial")
-            return connectedWatch
-        }
-
-        override fun activeApp(watch: WatchIdentifier): UUID? {
-            if (activeAppQueryFails) throw SecurityException("Permission Denial")
-            return openApp
-        }
-
-        private fun changes(ticks: Flow<Int>, onSubscribe: () -> Unit = {}): Flow<Unit> = flow {
-            onSubscribe()
-            if (subscribeFails) throw SecurityException("Failed to find provider for user 0")
-            ticks.collect { emit(Unit) }
-        }
-    }
-
-    private class Fixture(scope: TestScope) {
-        val provider = FakeProvider()
-        val states = mutableListOf<Boolean>()
-
-        // isActive() never completes, so it is collected on backgroundScope, like NavSyncer's
-        // init block in NavSyncerTest; collection starts on the first runCurrent()/advanceTimeBy().
-        val collection = scope.backgroundScope.launch {
-            PebbleActiveAppObserver(provider, RETRY_INTERVAL_MS).isActive(Protocol.WATCHAPP_UUID).toList(states)
-        }
-    }
-
-    private fun TestScope.fixture() = Fixture(this)
-
     @Test
     fun reportsWatchappOpenOnlyWhileItIsActiveOnTheConnectedWatch() = runTest {
         val f = fixture()
@@ -166,6 +112,60 @@ class PebbleActiveAppObserverTest {
         f.provider.notifyActiveAppChanged()
         runCurrent()
         assertEquals(listOf(false, true), f.states)
+    }
+
+    private fun TestScope.fixture() = Fixture(this)
+
+    /** Fails the way the real provider does while the Pebble app is missing: with [SecurityException]. */
+    private class FakeProvider : PebbleProvider {
+        var connectedWatch: WatchIdentifier? = null
+        var openApp: UUID? = null
+        var subscribeFails = false
+        var watchQueryFails = false
+        var activeAppQueryFails = false
+        var connectedWatchSubscriptions = 0
+
+        private val connectedWatchTicks = MutableStateFlow(0)
+        private val activeAppTicks = MutableStateFlow(0)
+
+        fun notifyConnectedWatchChanged() {
+            connectedWatchTicks.value++
+        }
+
+        fun notifyActiveAppChanged() {
+            activeAppTicks.value++
+        }
+
+        override fun connectedWatchChanges(): Flow<Unit> = changes(connectedWatchTicks) { connectedWatchSubscriptions++ }
+
+        override fun activeAppChanges(watch: WatchIdentifier): Flow<Unit> = changes(activeAppTicks)
+
+        override fun firstConnectedWatch(): WatchIdentifier? {
+            if (watchQueryFails) throw SecurityException("Permission Denial")
+            return connectedWatch
+        }
+
+        override fun activeApp(watch: WatchIdentifier): UUID? {
+            if (activeAppQueryFails) throw SecurityException("Permission Denial")
+            return openApp
+        }
+
+        private fun changes(ticks: Flow<Int>, onSubscribe: () -> Unit = {}): Flow<Unit> = flow {
+            onSubscribe()
+            if (subscribeFails) throw SecurityException("Failed to find provider for user 0")
+            ticks.collect { emit(Unit) }
+        }
+    }
+
+    private class Fixture(scope: TestScope) {
+        val provider = FakeProvider()
+        val states = mutableListOf<Boolean>()
+
+        // isActive() never completes, so it is collected on backgroundScope, like NavSyncer's
+        // init block in NavSyncerTest; collection starts on the first runCurrent()/advanceTimeBy().
+        val collection = scope.backgroundScope.launch {
+            PebbleActiveAppObserver(provider, RETRY_INTERVAL_MS).isActive(Protocol.WATCHAPP_UUID).toList(states)
+        }
     }
 
     private companion object {

@@ -6,13 +6,6 @@ import java.io.File
 
 /** Unit tests run with the module directory (android/app) as working directory. */
 class DemoArraysResourcesTest {
-    private fun arrayLengths(path: String): Map<String, Int> {
-        val xml = File(path).readText()
-        return Regex("<string-array name=\"([a-z_]+)\">(.*?)</string-array>", RegexOption.DOT_MATCHES_ALL)
-            .findAll(xml)
-            .associate { it.groupValues[1] to Regex("<item>").findAll(it.groupValues[2]).count() }
-    }
-
     @Test
     fun `English and Russian demo arrays declare the same arrays with the same lengths`() {
         val english = arrayLengths("src/main/res/values/demo_arrays.xml")
@@ -29,5 +22,12 @@ class DemoArraysResourcesTest {
         for ((name, length) in english) {
             assertEquals("$name length must match DemoScript.DEMO_ICON_SEQUENCE", DemoScript.DEMO_ICON_SEQUENCE.size, length)
         }
+    }
+
+    private fun arrayLengths(path: String): Map<String, Int> {
+        val xml = File(path).readText()
+        return Regex("<string-array name=\"([a-z_]+)\">(.*?)</string-array>", RegexOption.DOT_MATCHES_ALL)
+            .findAll(xml)
+            .associate { it.groupValues[1] to Regex("<item>").findAll(it.groupValues[2]).count() }
     }
 }
