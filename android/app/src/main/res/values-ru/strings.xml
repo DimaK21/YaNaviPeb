@@ -4,6 +4,10 @@
     <string name="status_pebble_on">Приложение Pebble: найдено</string>
     <string name="status_pebble_off">Приложение Pebble: не найдено</string>
     <string name="open_access">Открыть настройки доступа к уведомлениям</string>
+    <string name="access_disclosure_title">Доступ к уведомлениям</string>
+    <string name="access_disclosure_message">YaNaviPeb читает уведомление о текущей навигации из Яндекс Карт или Яндекс Навигатора: следующий манёвр, расстояние, название улицы, оставшийся путь и время прибытия. Эти данные передаются в приложение Pebble и на ваши часы, чтобы показывать подсказки на экране. Другие уведомления приложение не читает. Данные не сохраняются и не отправляются на серверы; у приложения нет доступа в интернет.\n\nДалее Android откроет настройки доступа к уведомлениям, где нужно включить YaNaviPeb.</string>
+    <string name="access_disclosure_accept">Согласен, продолжить</string>
+    <string name="access_disclosure_decline">Не сейчас</string>
     <string name="battery_hint">Чтобы навигация работала в фоне, отключите оптимизацию батареи для YaNaviPeb и для приложения Pebble.</string>
     <string name="demo_start">Запустить демо на часах</string>
     <string name="demo_stop">Остановить демо</string>
