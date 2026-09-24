@@ -15,47 +15,6 @@ import ru.kryu.yanavipeb.nav.NavState
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class NavSyncerTest {
-    private class FakeTransport(private val clock: () -> Long) : WatchTransport {
-        val sends = mutableListOf<Pair<Long, PebbleDictionary>>()
-        var starts = 0
-        var stops = 0
-        var sendResult = true
-
-        /** Stands in for PebbleActiveAppObserver: tests flip this instead of pushing open/close events. */
-        val watchOpenFlow = MutableStateFlow(false)
-
-        override suspend fun send(data: PebbleDictionary): Boolean {
-            sends += clock() to data
-            return sendResult
-        }
-
-        override suspend fun startApp(): Boolean {
-            starts++
-            return true
-        }
-
-        override suspend fun stopApp(): Boolean {
-            stops++
-            return true
-        }
-
-        override fun watchappOpen(): Flow<Boolean> = watchOpenFlow
-    }
-
-    private class Fixture(scope: TestScope) {
-        val transport = FakeTransport { scope.testScheduler.currentTime }
-
-        // NavSyncer's init block collects transport.watchappOpen() for its whole lifetime, so it
-        // must run on backgroundScope: runTest fails if a coroutine on the test's own scope is
-        // still active when the test body returns (kotlinx.coroutines.test.UncompletedCoroutinesError).
-        val syncer = NavSyncer(transport, scope.backgroundScope, { scope.testScheduler.currentTime })
-    }
-
-    private fun nav(distance: String = "150 м") =
-        NavState(true, distance, "Поверните направо", "1,61 км", "23:57", "15 мин", ByteArray(Protocol.ICON_BYTES) { 1 })
-
-    private fun TestScope.fixture() = Fixture(this)
-
     @Test
     fun startsWatchappWhenNavigationBegins() = runTest {
         val f = fixture()
@@ -230,5 +189,46 @@ class NavSyncerTest {
 
         assertEquals(1, f.transport.sends.size)
         assertEquals(0, f.transport.stops)
+    }
+
+    private fun nav(distance: String = "150 м") =
+        NavState(true, distance, "Поверните направо", "1,61 км", "23:57", "15 мин", ByteArray(Protocol.ICON_BYTES) { 1 })
+
+    private fun TestScope.fixture() = Fixture(this)
+
+    private class FakeTransport(private val clock: () -> Long) : WatchTransport {
+        val sends = mutableListOf<Pair<Long, PebbleDictionary>>()
+        var starts = 0
+        var stops = 0
+        var sendResult = true
+
+        /** Stands in for PebbleActiveAppObserver: tests flip this instead of pushing open/close events. */
+        val watchOpenFlow = MutableStateFlow(false)
+
+        override suspend fun send(data: PebbleDictionary): Boolean {
+            sends += clock() to data
+            return sendResult
+        }
+
+        override suspend fun startApp(): Boolean {
+            starts++
+            return true
+        }
+
+        override suspend fun stopApp(): Boolean {
+            stops++
+            return true
+        }
+
+        override fun watchappOpen(): Flow<Boolean> = watchOpenFlow
+    }
+
+    private class Fixture(scope: TestScope) {
+        val transport = FakeTransport { scope.testScheduler.currentTime }
+
+        // NavSyncer's init block collects transport.watchappOpen() for its whole lifetime, so it
+        // must run on backgroundScope: runTest fails if a coroutine on the test's own scope is
+        // still active when the test body returns (kotlinx.coroutines.test.UncompletedCoroutinesError).
+        val syncer = NavSyncer(transport, scope.backgroundScope, { scope.testScheduler.currentTime })
     }
 }

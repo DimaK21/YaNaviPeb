@@ -8,14 +8,6 @@ import ru.kryu.yanavipeb.watch.Protocol
 
 /** Values below come from the notification dump recorded in spike-notification-dump. */
 class NavStateParserTest {
-    private fun snapshot(
-        title: String? = null,
-        text: String? = null,
-        customView: Boolean = true,
-        views: Map<String, String> = emptyMap(),
-        icon: IntArray? = null,
-    ) = NotificationSnapshot(title, text, customView, views, icon)
-
     @Test
     fun notificationWithoutRouteIsIdle() {
         val state = NavStateParser.parse(snapshot(title = "Навигатор запущен", customView = false))
@@ -105,4 +97,12 @@ class NavStateParserTest {
     fun noIconPixelsMeansNoIcon() {
         assertNull(NavStateParser.parse(snapshot()).icon)
     }
+
+    private fun snapshot(
+        title: String? = null,
+        text: String? = null,
+        customView: Boolean = true,
+        views: Map<String, String> = emptyMap(),
+        icon: IntArray? = null,
+    ) = NotificationSnapshot(title, text, customView, views, icon)
 }

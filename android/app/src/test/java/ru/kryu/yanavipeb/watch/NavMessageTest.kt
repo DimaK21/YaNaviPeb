@@ -9,12 +9,6 @@ import ru.kryu.yanavipeb.nav.NavState
 class NavMessageTest {
     private val icon = ByteArray(Protocol.ICON_BYTES) { 0x0F }
 
-    private fun nav(
-        distance: String = "150 м",
-        maneuver: String = "Поверните направо",
-        icon: ByteArray? = this.icon,
-    ) = NavState(true, distance, maneuver, "1,61 км", "23:57", "15 мин", icon)
-
     @Test
     fun firstMessageCarriesEveryField() {
         val message = NavMessage.diff(null, nav())
@@ -86,4 +80,10 @@ class NavMessageTest {
         assertEquals("привет", "привет".truncateUtf8(12))
         assertEquals("", "привет".truncateUtf8(1))
     }
+
+    private fun nav(
+        distance: String = "150 м",
+        maneuver: String = "Поверните направо",
+        icon: ByteArray? = this.icon,
+    ) = NavState(true, distance, maneuver, "1,61 км", "23:57", "15 мин", icon)
 }

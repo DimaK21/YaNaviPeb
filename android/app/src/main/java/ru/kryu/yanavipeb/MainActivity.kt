@@ -22,6 +22,15 @@ import ru.kryu.yanavipeb.watch.PackageManagerPebbleAppChecker
 import ru.kryu.yanavipeb.watch.PebbleAppChecker
 
 class MainActivity : AppCompatActivity() {
+    private val scope = MainScope()
+    private var demoJob: Job? = null
+    private lateinit var binding: ActivityMainBinding
+    private val notificationAccessChecker: NotificationAccessChecker by lazy {
+        NotificationListenerAccessChecker(applicationContext)
+    }
+    private val pebbleAppChecker: PebbleAppChecker by lazy {
+        PackageManagerPebbleAppChecker(applicationContext)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,16 +54,6 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         scope.cancel()
         super.onDestroy()
-    }
-
-    private val scope = MainScope()
-    private var demoJob: Job? = null
-    private lateinit var binding: ActivityMainBinding
-    private val notificationAccessChecker: NotificationAccessChecker by lazy {
-        NotificationListenerAccessChecker(applicationContext)
-    }
-    private val pebbleAppChecker: PebbleAppChecker by lazy {
-        PackageManagerPebbleAppChecker(applicationContext)
     }
 
     // Google Play prominent disclosure: shown before the system settings, and only an explicit

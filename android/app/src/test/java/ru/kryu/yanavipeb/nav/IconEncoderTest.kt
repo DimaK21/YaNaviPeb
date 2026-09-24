@@ -9,13 +9,6 @@ import ru.kryu.yanavipeb.watch.Protocol
 class IconEncoderTest {
     private val edge = Protocol.ICON_SIZE
 
-    private fun blank() = IntArray(edge * edge)
-
-    private fun IntArray.put(x: Int, y: Int, argb: Int): IntArray {
-        this[y * edge + x] = argb
-        return this
-    }
-
     @Test
     fun transparentImageEncodesToZeros() {
         assertArrayEquals(ByteArray(Protocol.ICON_BYTES), IconEncoder.encode(blank()))
@@ -68,5 +61,12 @@ class IconEncoderTest {
     @Test
     fun rejectsWrongPixelCount() {
         assertThrows(IllegalArgumentException::class.java) { IconEncoder.encode(IntArray(10)) }
+    }
+
+    private fun blank() = IntArray(edge * edge)
+
+    private fun IntArray.put(x: Int, y: Int, argb: Int): IntArray {
+        this[y * edge + x] = argb
+        return this
     }
 }
