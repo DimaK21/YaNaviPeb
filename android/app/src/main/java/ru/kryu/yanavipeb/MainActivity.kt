@@ -8,6 +8,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
@@ -32,9 +33,7 @@ class MainActivity : AppCompatActivity() {
             view.setPadding(bars.left, bars.top, bars.right, bars.bottom)
             insets
         }
-        binding.openAccessButton.setOnClickListener {
-            startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
-        }
+        binding.openAccessButton.setOnClickListener { showAccessDisclosure() }
         binding.demoButton.setOnClickListener { toggleDemo() }
     }
 
@@ -56,6 +55,19 @@ class MainActivity : AppCompatActivity() {
     }
     private val pebbleAppChecker: PebbleAppChecker by lazy {
         PackageManagerPebbleAppChecker(applicationContext)
+    }
+
+    // Google Play prominent disclosure: shown before the system settings, and only an explicit
+    // tap on the positive button proceeds; dismissing the dialog is not consent.
+    private fun showAccessDisclosure() {
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.access_disclosure_title)
+            .setMessage(R.string.access_disclosure_message)
+            .setNegativeButton(R.string.access_disclosure_decline, null)
+            .setPositiveButton(R.string.access_disclosure_accept) { _, _ ->
+                startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
+            }
+            .show()
     }
 
     private fun refreshStatus() {
