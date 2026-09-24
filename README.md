@@ -8,13 +8,9 @@ While Yandex Maps is guiding you along a route, the watch shows the maneuver arr
 it, the maneuver text ("Поверните направо", "Turn right"), the arrival time, the remaining distance
 and the remaining time. The watchapp opens by itself when navigation starts and closes after it ends.
 
-```
-        [ 64×64 arrow ]
-             150 м
-       Поверните направо
-  ─────────────────────────
-  23:57    1,61 км    15 мин
-```
+<p align="center">
+  <img src="docs/screenshot.png" width="200" alt="Watchapp screen in the emulator: right-turn arrow, 150 m, Turn right, arrival at 23:57, 1.61 km / 15 min left">
+</p>
 
 The project is not affiliated with Yandex or Core Devices and does not use their APIs: the data comes
 from the navigation notification that Yandex Maps shows on the phone. Text is shown exactly as
